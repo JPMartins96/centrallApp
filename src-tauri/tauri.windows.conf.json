@@ -8,7 +8,8 @@
         "width": 1280,
         "height": 720,
         "fullscreen": true,
-        "resizable": false
+        "maximized": true,
+        "resizable": true
       }
     ]
   }

@@ -1,6 +1,13 @@
 import { FaCog, FaPlay, FaVolumeMute, FaVolumeUp } from "react-icons/fa";
 import { LuRadioTower, LuSiren } from "react-icons/lu";
-import { ALERTS, RADIO_STATIONS, getAlertById, getRadioById, type AlertId, type RadioStationId } from "../config/catalog";
+import {
+  ALERTS,
+  RADIO_STATIONS,
+  getAlertById,
+  getRadioById,
+  type AlertId,
+  type RadioStationId,
+} from "../config/catalog";
 import type { CentralState } from "../types/remote";
 
 type CentralPanelProps = {
@@ -22,13 +29,20 @@ export function CentralPanel({
   onVolumeChange,
   onOpenSettings,
 }: CentralPanelProps) {
-  const activeAlert = state.activeAlert ? getAlertById(state.activeAlert) : null;
-  const activeRadio = state.activeRadio ? getRadioById(state.activeRadio) : null;
+  const activeAlert = state.activeAlert
+    ? getAlertById(state.activeAlert)
+    : null;
+  const activeRadio = state.activeRadio
+    ? getRadioById(state.activeRadio)
+    : null;
 
   return (
     <>
       <div className="contentWrapper">
-        <section className="container alertasWrapper" aria-labelledby="alerts-title">
+        <section
+          className="container alertasWrapper"
+          aria-labelledby="alerts-title"
+        >
           <div className="alertasHeader">
             <LuSiren size={32} aria-hidden="true" />
             <h3 id="alerts-title">Alertas</h3>
@@ -58,15 +72,19 @@ export function CentralPanel({
           </div>
         </section>
 
-        <section className="container radiosWrapper" aria-labelledby="radios-title">
+        <section
+          className="container radiosWrapper"
+          aria-labelledby="radios-title"
+        >
           <div className="radiosHeader">
             <LuRadioTower size={32} aria-hidden="true" />
             <h3 id="radios-title">Radios</h3>
           </div>
-          <div className="btnWrapper radioWrapper">
+          <div className="radioWrapper">
             {RADIO_STATIONS.map((station) => {
               const Icon = station.icon;
-              const isActive = state.isRadioPlaying && state.activeRadio === station.id;
+              const isActive =
+                state.isRadioPlaying && state.activeRadio === station.id;
 
               return (
                 <button
@@ -85,21 +103,36 @@ export function CentralPanel({
         </section>
       </div>
 
-      <section className="container controlPanelWrapper" aria-label="Controlos principais">
+      <section
+        className="container controlPanelWrapper"
+        aria-label="Controlos principais"
+      >
         {state.activeAlert ? (
-          <button type="button" onClick={onStopAlert} className="controlBtn stopAlertBtn">
+          <button
+            type="button"
+            onClick={onStopAlert}
+            className="controlBtn stopAlertBtn"
+          >
             <LuSiren size={25} aria-hidden="true" />
             <span>Parar Alerta</span>
           </button>
         ) : null}
 
         {state.isRadioPlaying ? (
-          <button type="button" onClick={onStopRadio} className="controlBtn stopRadioBtn">
+          <button
+            type="button"
+            onClick={onStopRadio}
+            className="controlBtn stopRadioBtn"
+          >
             <FaVolumeMute size={25} aria-hidden="true" />
             <span>Parar Radio</span>
           </button>
         ) : (
-          <button type="button" onClick={() => onPlayRadio()} className="controlBtn playRadioBtn">
+          <button
+            type="button"
+            onClick={() => onPlayRadio()}
+            className="controlBtn playRadioBtn"
+          >
             <FaPlay size={25} aria-hidden="true" />
             <span>Play Radio</span>
           </button>
@@ -122,16 +155,24 @@ export function CentralPanel({
 
         <div className="infoRadio">
           <span>A reproduzir:</span>
-          <strong>{state.isRadioPlaying ? activeRadio?.name ?? "Radio" : "Nenhum"}</strong>
+          <strong>
+            {state.isRadioPlaying ? (activeRadio?.name ?? "Radio") : "Nenhum"}
+          </strong>
         </div>
 
-        <button type="button" className="controlBtn secondaryBtn settingsBtn" onClick={onOpenSettings}>
+        <button
+          type="button"
+          className="controlBtn secondaryBtn settingsBtn"
+          onClick={onOpenSettings}
+        >
           <FaCog aria-hidden="true" />
           <span>Configuracoes</span>
         </button>
       </section>
 
-      {state.lastError ? <p className="errorBanner">{state.lastError}</p> : null}
+      {state.lastError ? (
+        <p className="errorBanner">{state.lastError}</p>
+      ) : null}
     </>
   );
 }
