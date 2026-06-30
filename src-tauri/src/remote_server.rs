@@ -79,7 +79,7 @@ impl Default for CentralState {
             active_alert: None,
             active_radio: Some("rfm".to_string()),
             is_radio_playing: false,
-            radio_volume: 0.99,
+            radio_volume: 1.0,
             last_error: None,
         }
     }

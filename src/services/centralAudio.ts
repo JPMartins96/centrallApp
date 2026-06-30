@@ -9,13 +9,19 @@ import type { CentralState } from "../types/remote";
 
 type StateListener = (state: CentralState) => void;
 
+const ALERT_OUTPUT_VOLUME = 1;
+const RADIO_OUTPUT_VOLUME_AT_SLIDER_MAX = 0.3;
+const RADIO_RESUME_DELAY_MS = 2000;
+
 export class CentralAudioService {
   private alertAudio: HTMLAudioElement | null = null;
   private radioAudio: HTMLAudioElement | null = null;
+  private radioVolumeGuard: number | null = null;
+  private radioResumeTimeout: number | null = null;
   private currentAlert: AlertId | null = null;
   private currentRadio: RadioStationId | null = DEFAULT_RADIO_ID;
   private isRadioPlaying = false;
-  private radioVolume = 0.99;
+  private radioVolume = 1;
   private lastError: string | null = null;
   private lastAlertStart: { id: AlertId; at: number } | null = null;
   private listener: StateListener;
@@ -55,12 +61,14 @@ export class CentralAudioService {
       this.stopAlert(false);
     }
 
+    this.cancelScheduledRadioRestore();
+
     if (this.radioAudio) {
       this.radioAudio.muted = true;
     }
 
     const audio = new Audio(alert.soundPath);
-    audio.volume = 1;
+    audio.volume = ALERT_OUTPUT_VOLUME;
 
     this.alertAudio = audio;
     this.currentAlert = alertId;
@@ -81,6 +89,11 @@ export class CentralAudioService {
       this.setError(`Erro ao reproduzir o alerta ${alert.label}.`);
       finishAlert();
     };
+    audio.onvolumechange = () => {
+      if (audio.volume !== ALERT_OUTPUT_VOLUME) {
+        audio.volume = ALERT_OUTPUT_VOLUME;
+      }
+    };
 
     try {
       await audio.play();
@@ -95,6 +108,7 @@ export class CentralAudioService {
     if (this.alertAudio) {
       this.alertAudio.onended = null;
       this.alertAudio.onerror = null;
+      this.alertAudio.onvolumechange = null;
       this.alertAudio.pause();
       this.alertAudio.currentTime = 0;
     }
@@ -103,13 +117,15 @@ export class CentralAudioService {
     this.currentAlert = null;
 
     if (restoreRadioAfter) {
-      this.restoreRadio();
+      this.scheduleRadioRestore();
     }
 
     this.notify();
   }
 
-  async playRadio(radioId: RadioStationId = this.currentRadio ?? DEFAULT_RADIO_ID) {
+  async playRadio(
+    radioId: RadioStationId = this.currentRadio ?? DEFAULT_RADIO_ID,
+  ) {
     const station = getRadioById(radioId);
 
     if (!station) {
@@ -117,7 +133,11 @@ export class CentralAudioService {
       return;
     }
 
-    if (this.radioAudio && this.currentRadio === station.id && this.isRadioPlaying) {
+    if (
+      this.radioAudio &&
+      this.currentRadio === station.id &&
+      this.isRadioPlaying
+    ) {
       this.currentRadio = station.id;
       this.notify();
       return;
@@ -129,11 +149,13 @@ export class CentralAudioService {
 
     const radio = new Audio();
     radio.preload = "none";
-    radio.src = station.url;
-    radio.volume = this.radioVolume;
+    radio.volume = this.getEffectiveRadioVolume();
     radio.muted = Boolean(this.alertAudio);
+    radio.src = station.url;
 
     this.radioAudio = radio;
+    this.startRadioVolumeGuard();
+    this.applyRadioOutputVolume();
     this.currentRadio = station.id;
     this.lastError = null;
     this.notify();
@@ -146,9 +168,22 @@ export class CentralAudioService {
       this.setError(`Erro ao reproduzir a estacao ${station.name}.`);
       this.stopRadio();
     };
+    radio.onvolumechange = () => {
+      this.applyRadioOutputVolume();
+    };
+    radio.onloadedmetadata = () => {
+      this.applyRadioOutputVolume();
+    };
+    radio.oncanplay = () => {
+      this.applyRadioOutputVolume();
+    };
+    radio.onplaying = () => {
+      this.applyRadioOutputVolume();
+    };
 
     try {
       await radio.play();
+      this.applyRadioOutputVolume();
       this.isRadioPlaying = true;
       this.notify();
     } catch (error) {
@@ -162,8 +197,15 @@ export class CentralAudioService {
   }
 
   stopRadio() {
+    this.cancelScheduledRadioRestore();
+    this.stopRadioVolumeGuard();
+
     if (this.radioAudio) {
       this.radioAudio.onerror = null;
+      this.radioAudio.onvolumechange = null;
+      this.radioAudio.onloadedmetadata = null;
+      this.radioAudio.oncanplay = null;
+      this.radioAudio.onplaying = null;
       this.radioAudio.pause();
       this.radioAudio.removeAttribute("src");
       this.radioAudio.load();
@@ -179,18 +221,41 @@ export class CentralAudioService {
     this.radioVolume = nextVolume;
 
     if (this.radioAudio) {
-      this.radioAudio.volume = nextVolume;
+      this.applyRadioOutputVolume();
     }
 
     this.notify();
   }
 
   destroy() {
+    this.cancelScheduledRadioRestore();
     this.stopAlert(false);
     this.stopRadio();
   }
 
+  private scheduleRadioRestore() {
+    this.cancelScheduledRadioRestore();
+
+    this.radioResumeTimeout = window.setTimeout(() => {
+      this.radioResumeTimeout = null;
+      this.restoreRadio();
+    }, RADIO_RESUME_DELAY_MS);
+  }
+
+  private cancelScheduledRadioRestore() {
+    if (this.radioResumeTimeout === null) {
+      return;
+    }
+
+    window.clearTimeout(this.radioResumeTimeout);
+    this.radioResumeTimeout = null;
+  }
+
   private restoreRadio() {
+    if (this.alertAudio) {
+      return;
+    }
+
     if (this.radioAudio) {
       this.radioAudio.muted = false;
     }
@@ -199,6 +264,39 @@ export class CentralAudioService {
   private setError(message: string) {
     this.lastError = message;
     this.notify();
+  }
+
+  private getEffectiveRadioVolume() {
+    return this.radioVolume * RADIO_OUTPUT_VOLUME_AT_SLIDER_MAX;
+  }
+
+  private applyRadioOutputVolume() {
+    if (!this.radioAudio) {
+      return;
+    }
+
+    const effectiveVolume = this.getEffectiveRadioVolume();
+
+    if (Math.abs(this.radioAudio.volume - effectiveVolume) > 0.001) {
+      this.radioAudio.volume = effectiveVolume;
+    }
+  }
+
+  private startRadioVolumeGuard() {
+    this.stopRadioVolumeGuard();
+
+    this.radioVolumeGuard = window.setInterval(() => {
+      this.applyRadioOutputVolume();
+    }, 250);
+  }
+
+  private stopRadioVolumeGuard() {
+    if (this.radioVolumeGuard === null) {
+      return;
+    }
+
+    window.clearInterval(this.radioVolumeGuard);
+    this.radioVolumeGuard = null;
   }
 
   private notify() {

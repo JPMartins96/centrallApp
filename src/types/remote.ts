@@ -49,6 +49,6 @@ export const DEFAULT_CENTRAL_STATE: CentralState = {
   activeAlert: null,
   activeRadio: null,
   isRadioPlaying: false,
-  radioVolume: 0.99,
+  radioVolume: 1,
   lastError: null,
 };
