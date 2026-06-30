@@ -42,7 +42,7 @@ const ALERT_IDS: &[&str] = &[
     "alvorada",
 ];
 
-const RADIO_IDS: &[&str] = &["rfm", "m80", "radio-comercial", "antena-3"];
+const RADIO_IDS: &[&str] = &["rfm", "m80", "radio-comercial", "RR"];
 
 #[derive(Clone)]
 pub struct RemoteServer {
@@ -480,9 +480,9 @@ async fn catalog(
                 name: Some("Radio Comercial"),
             },
             CatalogItem {
-                id: "antena-3",
-                label: "Antena 3",
-                name: Some("Antena 3"),
+                id: "RR",
+                label: "Rádio Renascença",
+                name: Some("Rádio Renascença"),
             },
         ],
     }))

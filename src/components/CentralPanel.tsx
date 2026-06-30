@@ -82,7 +82,6 @@ export function CentralPanel({
           </div>
           <div className="radioWrapper">
             {RADIO_STATIONS.map((station) => {
-              const Icon = station.icon;
               const isActive =
                 state.isRadioPlaying && state.activeRadio === station.id;
 
@@ -94,7 +93,12 @@ export function CentralPanel({
                   onClick={() => onPlayRadio(station.id)}
                   aria-pressed={isActive}
                 >
-                  <Icon size={60} aria-hidden="true" />
+                  <img
+                    src={station.icon}
+                    width={100}
+                    alt=""
+                    aria-hidden="true"
+                  />
                   <span>{station.name}</span>
                 </button>
               );

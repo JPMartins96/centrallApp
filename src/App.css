@@ -216,6 +216,8 @@ main {
 
 .radioButton {
   background: linear-gradient(145deg, #235f98 0%, #123355 100%);
+  display: flex;
+  justify-content: space-between;
 }
 
 .controlPanelWrapper {

@@ -1,6 +1,6 @@
 import type { IconType } from "react-icons";
 import { FaCarCrash } from "react-icons/fa";
-import { FaHouseFire, FaRadio } from "react-icons/fa6";
+import { FaHouseFire } from "react-icons/fa6";
 import {
   GiAmbulance,
   GiBurningForest,
@@ -72,25 +72,25 @@ export const RADIO_STATIONS = [
     id: "rfm",
     name: "RFM",
     url: "https://playerservices.streamtheworld.com/api/livestream-redirect/RFM.mp3",
-    icon: FaRadio,
+    icon: "/RFM.png",
   },
   {
     id: "m80",
     name: "M80",
     url: "https://stream-icy.bauermedia.pt/m80.mp3",
-    icon: FaRadio,
+    icon: "/M80.png",
   },
   {
     id: "radio-comercial",
     name: "Radio Comercial",
     url: "https://stream-icy.bauermedia.pt/comercial.mp3",
-    icon: FaRadio,
+    icon: "/RC.png",
   },
   {
-    id: "antena-3",
-    name: "Antena 3",
-    url: "https://streaming-live.rtp.pt/liveradio/antena380a/playlist.m3u8",
-    icon: FaRadio,
+    id: "RR",
+    name: "Rádio Renascença",
+    url: "https://playerservices.streamtheworld.com/api/livestream-redirect/RADIO_RENASCENCA.mp3",
+    icon: "/RR.png",
   },
 ] as const;
 
@@ -109,7 +109,7 @@ export type RadioStation = {
   id: RadioStationId;
   name: string;
   url: string;
-  icon: IconType;
+  icon: string;
 };
 
 export const DEFAULT_RADIO_ID: RadioStationId = "rfm";
