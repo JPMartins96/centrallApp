@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Central Alarmes</string>
+    <string name="title_activity_main">Central Alarmes</string>
+    <string name="package_name">pt.bombeiros.centralalarmes</string>
+    <string name="custom_url_scheme">pt.bombeiros.centralalarmes</string>
+</resources>

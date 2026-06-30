@@ -1,11 +1,26 @@
 :root {
   font-family: Inter, Avenir, Helvetica, Arial, sans-serif;
   font-size: 16px;
-  line-height: 24px;
+  line-height: 1.5;
   font-weight: 400;
-  color: #000000;
+  color: #f6f6f6;
+  background-color: #050505;
   -moz-osx-font-smoothing: grayscale;
   -webkit-text-size-adjust: 100%;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+button,
+input {
+  font: inherit;
+}
+
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.55;
 }
 
 main {
@@ -13,30 +28,37 @@ main {
   display: flex;
   flex-direction: column;
   gap: 16px;
+  padding: 16px;
 }
+
 .container {
   padding: 16px;
   margin: 0;
   display: flex;
-  border-radius: 10px;
-  background-color: #0f0f0f;
+  border-radius: 8px;
+  background-color: #111111;
+  border: 1px solid #262626;
 }
 
 .header {
   gap: 16px;
-
-  h2 {
-    position: relative;
-    font-size: 14px;
-    font-weight: 200;
-    bottom: 14px;
-  }
+  align-items: center;
 }
 
-.contentWrapper {
-  display: flex;
-  flex-direction: column;
-  gap: 50px;
+.header h1,
+.header h2,
+.remoteAdmin h3,
+.remoteAdmin h4,
+.mobileShell h1,
+.mobileShell h2 {
+  margin: 0;
+  letter-spacing: 0;
+}
+
+.header h2 {
+  font-size: 14px;
+  font-weight: 300;
+  color: #c9c9c9;
 }
 
 .headerIcon {
@@ -44,38 +66,36 @@ main {
   height: 80px;
 }
 
-.alertasWrapper {
+.contentWrapper {
   display: flex;
   flex-direction: column;
   gap: 16px;
 }
 
-.alertasHeader {
+.alertasWrapper,
+.radiosWrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.alertasHeader,
+.radiosHeader,
+.panelHeader {
   position: relative;
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   width: 100%;
 }
 
-.alertasHeader::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 2px;
-  background: linear-gradient(to right, red, transparent);
-}
-
+.alertasHeader,
 .radiosHeader {
-  position: relative;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  gap: 8px;
+  justify-content: flex-start;
 }
 
+.alertasHeader::after,
 .radiosHeader::after {
   content: "";
   position: absolute;
@@ -83,20 +103,26 @@ main {
   right: 0;
   bottom: 0;
   height: 2px;
-  background: linear-gradient(to right, #063066, transparent);
 }
 
-.radiosWrapper {
+.alertasHeader::after {
+  background: linear-gradient(to right, #df2b20, transparent);
+}
+
+.radiosHeader::after {
+  background: linear-gradient(to right, #1a75d8, transparent);
+}
+
+.statusLine {
   display: flex;
-  flex-direction: column;
-  gap: 16px;
+  gap: 8px;
+  color: #d8d8d8;
 }
 
 .btnWrapper {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 8px;
-  place-items: center;
+  grid-template-columns: repeat(2, minmax(130px, 1fr));
+  gap: 10px;
 }
 
 .btnAlerta {
@@ -104,95 +130,109 @@ main {
   align-items: center;
   justify-content: center;
   flex-direction: column;
-  width: 150px;
-  height: 150px;
+  min-height: 150px;
   gap: 8px;
-  font-weight: 600;
+  font-weight: 700;
   padding: 16px;
   cursor: pointer;
-  border-radius: 10px;
-  border: none;
+  border-radius: 8px;
+  border: 2px solid transparent;
   color: white;
   background: linear-gradient(145deg, #1478d4 0%, #063b80 100%);
+  text-align: center;
+}
+
+.btnAlerta:hover,
+.btnAlerta:focus-visible {
+  filter: brightness(1.2);
+}
+
+.btnAlerta.active {
+  border-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.25);
+}
+
+.radioButton {
+  background: linear-gradient(145deg, #235f98 0%, #123355 100%);
 }
 
 .controlPanelWrapper {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 32px;
+  flex-wrap: wrap;
+  gap: 16px;
 }
 
+.stopAlertBtn,
 .stopRadioBtn {
   background: linear-gradient(145deg, #f03225 0%, #c51f14 55%, #86130c 100%);
 }
+
 .playRadioBtn {
   background: linear-gradient(145deg, #2fa83a 0%, #1c7c28 55%, #12591c 100%);
 }
+
+.secondaryBtn {
+  background: #2c2c2c;
+}
+
 .controlBtn {
   display: flex;
   flex-direction: row;
   box-sizing: border-box;
   gap: 8px;
-  padding: 8px;
+  padding: 10px 12px;
   color: white;
   font-weight: 700;
-  border-radius: 10px;
-  border-color: transparent;
+  border-radius: 8px;
+  border: 1px solid transparent;
   align-items: center;
   justify-content: center;
-  width: 150px;
+  min-width: 150px;
+  min-height: 44px;
   cursor: pointer;
 }
 
 .volumeControl {
-  gap: 16px;
+  gap: 12px;
   display: flex;
   align-items: center;
 }
 
+.volumeSlider {
+  min-width: 180px;
+}
+
 input[type="range"]::-webkit-slider-runnable-track {
-  display: flex;
-  align-items: center;
-  height: 5px;
-  background: red;
+  height: 6px;
+  background: #d9271c;
   border-radius: 999px;
   cursor: pointer;
 }
 
-@media screen and (min-width: 1024px) {
-  .btnWrapper {
-    grid-template-columns: repeat(4, 1fr);
-  }
-
-  .radioWrapper {
-    grid-template-columns: repeat(2, 1fr);
-  }
-  .alertasWrapper {
-    width: 70%;
-  }
-  .contentWrapper {
-    flex-direction: row;
-  }
-  .radiosWrapper {
-    width: 30%;
-  }
-  .volumeControl::after {
-    content: "";
-    height: 30px;
-    top: 0;
-    right: 0;
-    left: 0;
-    margin-left: 16px;
-    width: 1px;
-    background-color: white;
-  }
+.infoRadio {
+  display: grid;
+  gap: 2px;
+  min-width: 140px;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    color: #f6f6f6;
-    background-color: #000000;
-  }
+
+.infoRadio strong {
+  color: #9fd0ff;
+}
+
+.settingsBtn {
+  margin-left: auto;
+}
+
+.errorBanner,
+.mobileMessage {
+  margin: 0;
+  padding: 12px;
+  border-radius: 8px;
+  background: #3d160f;
+  border: 1px solid #a63a2b;
+  color: #ffffff;
 }
 
 .alerta-florestal {
@@ -227,7 +267,364 @@ input[type="range"]::-webkit-slider-runnable-track {
   background: linear-gradient(145deg, #667385 0%, #303947 100%);
 }
 
-.btnAlerta:hover {
-  filter: brightness(1.52);
-  /* transform: translateY(-2px); */
+.remoteAdmin {
+  flex-direction: column;
+  gap: 16px;
+}
+
+.settingsView {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.settingsToolbar {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  border-radius: 8px;
+  background: #111111;
+  border: 1px solid #262626;
+}
+
+.settingsToolbar h3,
+.settingsToolbar p {
+  margin: 0;
+}
+
+.settingsToolbar p {
+  color: #c9c9c9;
+}
+
+.panelHeader p,
+.mobileHint,
+.connectionUrl,
+.emptyState {
+  margin: 4px 0 0;
+  color: #c9c9c9;
+}
+
+.serverBadge {
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-weight: 700;
+  background: #3a160f;
+  color: #ffb7ad;
+}
+
+.serverBadge.online {
+  background: #10351c;
+  color: #a8f2bd;
+}
+
+.remoteGrid,
+.remoteLists {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+}
+
+.remoteCard {
+  padding: 14px;
+  border-radius: 8px;
+  border: 1px solid #2c2c2c;
+  background: #171717;
+}
+
+.serverFacts {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+  margin: 0;
+}
+
+.serverFacts dt {
+  color: #aaaaaa;
+  font-size: 13px;
+}
+
+.serverFacts dd {
+  margin: 0;
+  word-break: break-word;
+  font-weight: 700;
+}
+
+.adminActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 16px;
+}
+
+.qrCard {
+  display: grid;
+  place-items: center;
+  gap: 10px;
+}
+
+.qrImage,
+.qrPlaceholder {
+  width: 180px;
+  height: 180px;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.qrPlaceholder {
+  display: grid;
+  place-items: center;
+  color: #111111;
+  font-weight: 700;
+}
+
+.connectionUrl {
+  max-width: 100%;
+  word-break: break-all;
+  text-align: center;
+}
+
+.listBox {
+  display: grid;
+  gap: 8px;
+  max-height: 260px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.listRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 8px;
+  background: #181818;
+  border: 1px solid #2c2c2c;
+}
+
+.listRow span {
+  display: block;
+  color: #bdbdbd;
+  font-size: 13px;
+}
+
+.iconButton {
+  display: grid;
+  place-items: center;
+  width: 44px;
+  height: 44px;
+  border: 1px solid #484848;
+  border-radius: 8px;
+  color: #ffffff;
+  background: #2c2c2c;
+  cursor: pointer;
+}
+
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.mobileShell {
+  min-height: 100vh;
+  padding: 14px;
+  gap: 14px;
+  background: #080808;
+}
+
+.mobilePanel,
+.mobileSection,
+.mobileStatus {
+  display: grid;
+  gap: 14px;
+  padding: 16px;
+  border-radius: 8px;
+  background: #141414;
+  border: 1px solid #2c2c2c;
+}
+
+.mobilePanel label {
+  display: grid;
+  gap: 6px;
+  color: #d7d7d7;
+  font-weight: 700;
+}
+
+.mobilePanel input {
+  min-height: 48px;
+  border: 1px solid #444444;
+  border-radius: 8px;
+  padding: 10px 12px;
+  color: #ffffff;
+  background: #050505;
+}
+
+.mobilePrimaryBtn,
+.mobileStopBtn,
+.mobileTopbar button,
+.mobileRadioControls button,
+.mobileRadioList button,
+.mobileAlertGrid button,
+.confirmDialog button {
+  min-height: 48px;
+  border-radius: 8px;
+  border: 1px solid transparent;
+  padding: 12px;
+  font-weight: 800;
+  color: #ffffff;
+  background: #285fbd;
+}
+
+.mobilePrimaryBtn,
+.mobileStopBtn {
+  background: #c5271d;
+}
+
+.mobileTopbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+}
+
+.mobileTopbar div,
+.mobileRadioControls button,
+.mobileRadioList button,
+.mobileSection h2,
+.mobileVolume {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.mobileTopbar button {
+  min-height: 40px;
+  background: #2d2d2d;
+}
+
+.connectionDot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #d93a2d;
+}
+
+.connectionDot.connecting {
+  background: #d7a625;
+}
+
+.connectionDot.online {
+  background: #2bc26b;
+}
+
+.mobileStatus strong {
+  font-size: 24px;
+  line-height: 1.2;
+}
+
+.mobileAlertGrid,
+.mobileRadioList {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 10px;
+}
+
+.mobileAlertGrid button {
+  min-height: 70px;
+  text-align: left;
+  font-size: 18px;
+  background: #9a2119;
+}
+
+.mobileAlertGrid button.active,
+.mobileRadioList button.active {
+  border-color: #ffffff;
+}
+
+.mobileRadioControls {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.mobileRadioControls button,
+.mobileRadioList button {
+  background: #235f98;
+}
+
+.mobileVolume {
+  min-height: 54px;
+}
+
+.mobileVolume input {
+  flex: 1;
+}
+
+.confirmOverlay {
+  position: fixed;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+  background: rgba(0, 0, 0, 0.72);
+  z-index: 20;
+}
+
+.confirmDialog {
+  display: grid;
+  gap: 16px;
+  width: min(100%, 380px);
+  padding: 18px;
+  border-radius: 8px;
+  background: #171717;
+  border: 1px solid #4a4a4a;
+}
+
+.confirmDialog p {
+  margin: 0;
+  font-size: 22px;
+  font-weight: 800;
+}
+
+.confirmDialog div {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+}
+
+.confirmDialog button:first-child {
+  background: #2d2d2d;
+}
+
+@media screen and (min-width: 760px) {
+  .btnWrapper {
+    grid-template-columns: repeat(4, minmax(130px, 1fr));
+  }
+
+  .remoteGrid,
+  .remoteLists {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+
+@media screen and (min-width: 1024px) {
+  .contentWrapper {
+    flex-direction: row;
+  }
+
+  .alertasWrapper {
+    width: 70%;
+  }
+
+  .radiosWrapper {
+    width: 30%;
+  }
 }
