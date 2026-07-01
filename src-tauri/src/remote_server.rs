@@ -4,7 +4,7 @@ use axum::{
         ConnectInfo, Path, State,
     },
     http::{header, Method, StatusCode},
-    response::{IntoResponse, Response},
+    response::{Html, IntoResponse, Response},
     routing::{get, post},
     Json, Router,
 };
@@ -385,6 +385,8 @@ fn router(state: Arc<RemoteServerInner>) -> Router {
         .allow_headers([header::AUTHORIZATION, header::CONTENT_TYPE]);
 
     Router::new()
+        .route("/", get(remote_web_app))
+        .route("/remote", get(remote_web_app))
         .route("/api/health", get(health))
         .route("/api/catalog", get(catalog))
         .route("/api/state", get(get_state))
@@ -397,6 +399,13 @@ fn router(state: Arc<RemoteServerInner>) -> Router {
         .route("/ws", get(ws_handler))
         .layer(cors)
         .with_state(state)
+}
+
+async fn remote_web_app(
+    ConnectInfo(addr): ConnectInfo<SocketAddr>,
+) -> ApiResult<Html<&'static str>> {
+    ensure_local(addr)?;
+    Ok(Html(include_str!("remote_web.html")))
 }
 
 async fn health(

@@ -1,0 +1,550 @@
+<!doctype html>
+<html lang="pt">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Comando da Central</title>
+    <style>
+      :root {
+        color-scheme: light;
+        --bg: #f4f6f8;
+        --panel: #ffffff;
+        --text: #172026;
+        --muted: #64707d;
+        --line: #d7dde4;
+        --primary: #166534;
+        --primary-strong: #14532d;
+        --danger: #b42318;
+        --danger-strong: #8f1b12;
+        --blue: #1d4ed8;
+        --shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--text);
+        font-family:
+          system-ui,
+          -apple-system,
+          BlinkMacSystemFont,
+          "Segoe UI",
+          sans-serif;
+      }
+
+      button,
+      input {
+        font: inherit;
+      }
+
+      .shell {
+        width: min(980px, calc(100% - 28px));
+        margin: 0 auto;
+        padding: 18px 0 28px;
+      }
+
+      .topbar {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 14px;
+        margin-bottom: 16px;
+      }
+
+      h1,
+      h2 {
+        margin: 0;
+      }
+
+      h1 {
+        font-size: clamp(1.55rem, 6vw, 2.4rem);
+        line-height: 1.08;
+      }
+
+      h2 {
+        font-size: 1rem;
+      }
+
+      .subtitle {
+        margin: 4px 0 0;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .status {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        min-height: 36px;
+        padding: 8px 12px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        background: var(--panel);
+        box-shadow: var(--shadow);
+        white-space: nowrap;
+      }
+
+      .dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 999px;
+        background: #9ca3af;
+      }
+
+      .dot.online {
+        background: #16a34a;
+      }
+
+      .dot.offline {
+        background: #dc2626;
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1.25fr 0.75fr;
+        gap: 16px;
+      }
+
+      .panel {
+        background: var(--panel);
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        box-shadow: var(--shadow);
+        padding: 16px;
+      }
+
+      .panelHeader {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        margin-bottom: 14px;
+      }
+
+      .activeAlert {
+        border-left: 4px solid var(--danger);
+        padding: 10px 12px;
+        margin-bottom: 14px;
+        background: #fff7ed;
+      }
+
+      .activeAlert span {
+        display: block;
+        color: var(--muted);
+        font-size: 0.85rem;
+      }
+
+      .activeAlert strong {
+        display: block;
+        margin-top: 3px;
+        font-size: 1.12rem;
+      }
+
+      .alertGrid {
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .alertButton {
+        min-height: 78px;
+        border: 0;
+        border-radius: 8px;
+        color: #ffffff;
+        background: var(--danger);
+        font-weight: 800;
+        text-align: center;
+        padding: 12px;
+        cursor: pointer;
+      }
+
+      .alertButton:active {
+        background: var(--danger-strong);
+        transform: translateY(1px);
+      }
+
+      .alertButton.active {
+        outline: 4px solid rgba(180, 35, 24, 0.24);
+      }
+
+      .stopButton,
+      .radioButton,
+      .utilityButton {
+        min-height: 46px;
+        border-radius: 8px;
+        border: 1px solid transparent;
+        padding: 10px 12px;
+        font-weight: 700;
+        cursor: pointer;
+      }
+
+      .stopButton {
+        width: 100%;
+        margin-top: 12px;
+        background: #111827;
+        color: #ffffff;
+      }
+
+      .radioList {
+        display: grid;
+        gap: 8px;
+      }
+
+      .radioButton {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #eef2ff;
+        color: #1e293b;
+        border-color: #c7d2fe;
+      }
+
+      .radioButton.active {
+        background: var(--blue);
+        border-color: var(--blue);
+        color: #ffffff;
+      }
+
+      .radioControls {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 8px;
+        margin-top: 10px;
+      }
+
+      .utilityButton {
+        background: #ffffff;
+        border-color: var(--line);
+        color: var(--text);
+      }
+
+      .volume {
+        display: grid;
+        gap: 8px;
+        margin-top: 14px;
+        color: var(--muted);
+        font-weight: 700;
+      }
+
+      input[type="range"] {
+        width: 100%;
+        accent-color: var(--primary);
+      }
+
+      .message {
+        min-height: 22px;
+        margin: 12px 0 0;
+        color: var(--muted);
+        font-size: 0.95rem;
+      }
+
+      .error {
+        color: var(--danger);
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      @media (max-width: 760px) {
+        .topbar,
+        .panelHeader {
+          align-items: flex-start;
+          flex-direction: column;
+        }
+
+        .grid {
+          grid-template-columns: 1fr;
+        }
+
+        .status {
+          width: 100%;
+          justify-content: center;
+        }
+      }
+
+      @media (max-width: 460px) {
+        .shell {
+          width: min(100% - 20px, 980px);
+          padding-top: 12px;
+        }
+
+        .panel {
+          padding: 12px;
+        }
+
+        .alertGrid,
+        .radioControls {
+          grid-template-columns: 1fr;
+        }
+
+        .alertButton {
+          min-height: 64px;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="shell">
+      <header class="topbar">
+        <div>
+          <h1>Comando da Central</h1>
+          <p class="subtitle" id="serverName">A ligar ao servidor local</p>
+        </div>
+        <div class="status" aria-live="polite">
+          <span class="dot" id="connectionDot" aria-hidden="true"></span>
+          <strong id="connectionText">A ligar</strong>
+        </div>
+      </header>
+
+      <div class="grid">
+        <section class="panel" aria-labelledby="alertsTitle">
+          <div class="panelHeader">
+            <h2 id="alertsTitle">Alertas</h2>
+          </div>
+
+          <div class="activeAlert">
+            <span>Alerta ativo</span>
+            <strong id="activeAlert">Sem alerta ativo</strong>
+          </div>
+
+          <div class="alertGrid" id="alerts"></div>
+          <button class="stopButton" type="button" id="stopAlert">Parar alerta</button>
+          <p class="message" id="alertMessage" aria-live="polite"></p>
+        </section>
+
+        <section class="panel" aria-labelledby="radioTitle">
+          <div class="panelHeader">
+            <h2 id="radioTitle">Radio</h2>
+          </div>
+
+          <div class="radioList" id="radios"></div>
+
+          <div class="radioControls">
+            <button class="utilityButton" type="button" id="playRadio">Retomar</button>
+            <button class="utilityButton" type="button" id="stopRadio">Parar</button>
+          </div>
+
+          <label class="volume">
+            Volume
+            <input id="volume" type="range" min="0" max="1" step="0.01" value="1" />
+          </label>
+
+          <p class="message" id="radioMessage" aria-live="polite"></p>
+        </section>
+      </div>
+    </main>
+
+    <script>
+      const state = {
+        catalog: { alerts: [], radios: [] },
+        central: {
+          activeAlert: null,
+          activeRadio: null,
+          isRadioPlaying: false,
+          radioVolume: 1,
+          lastError: null,
+        },
+        socket: null,
+        reconnectTimer: null,
+      };
+
+      const elements = {
+        serverName: document.getElementById("serverName"),
+        connectionDot: document.getElementById("connectionDot"),
+        connectionText: document.getElementById("connectionText"),
+        activeAlert: document.getElementById("activeAlert"),
+        alerts: document.getElementById("alerts"),
+        radios: document.getElementById("radios"),
+        stopAlert: document.getElementById("stopAlert"),
+        playRadio: document.getElementById("playRadio"),
+        stopRadio: document.getElementById("stopRadio"),
+        volume: document.getElementById("volume"),
+        alertMessage: document.getElementById("alertMessage"),
+        radioMessage: document.getElementById("radioMessage"),
+      };
+
+      start();
+
+      elements.stopAlert.addEventListener("click", () => {
+        sendCommand("/api/alerts/stop", null, elements.alertMessage, "Alerta parado.");
+      });
+
+      elements.playRadio.addEventListener("click", () => {
+        sendCommand("/api/radio/play", null, elements.radioMessage, "Radio retomada.");
+      });
+
+      elements.stopRadio.addEventListener("click", () => {
+        sendCommand("/api/radio/stop", null, elements.radioMessage, "Radio parada.");
+      });
+
+      elements.volume.addEventListener("change", () => {
+        const volume = Number(elements.volume.value);
+        sendCommand(
+          "/api/radio/volume",
+          { volume },
+          elements.radioMessage,
+          "Volume atualizado.",
+        );
+      });
+
+      async function start() {
+        setConnection("connecting");
+
+        try {
+          const health = await apiFetch("/api/health");
+          elements.serverName.textContent = health.serverName || "Central de Alarmes";
+
+          const [catalog, centralState] = await Promise.all([
+            apiFetch("/api/catalog"),
+            apiFetch("/api/state"),
+          ]);
+
+          state.catalog = catalog;
+          state.central = centralState;
+          render();
+          setConnection("online");
+          connectWebSocket();
+        } catch (error) {
+          setConnection("offline");
+          showMessage(elements.alertMessage, error.message || "Servidor indisponivel.", true);
+        }
+      }
+
+      async function sendCommand(path, body, messageElement, successMessage) {
+        try {
+          await apiFetch(path, {
+            method: "POST",
+            headers: body ? { "Content-Type": "application/json" } : undefined,
+            body: body ? JSON.stringify(body) : undefined,
+          });
+          const nextState = await apiFetch("/api/state");
+          state.central = nextState;
+          render();
+          showMessage(messageElement, successMessage, false);
+        } catch (error) {
+          showMessage(messageElement, error.message || "Erro ao enviar comando.", true);
+        }
+      }
+
+      async function apiFetch(path, options) {
+        const response = await fetch(path, options);
+
+        if (!response.ok) {
+          let detail = `Pedido falhou (${response.status}).`;
+          try {
+            const payload = await response.json();
+            detail = payload.error || detail;
+          } catch (_) {}
+          throw new Error(detail);
+        }
+
+        return response.json();
+      }
+
+      function connectWebSocket() {
+        if (state.socket) {
+          state.socket.close();
+        }
+
+        const protocol = window.location.protocol === "https:" ? "wss:" : "ws:";
+        const socket = new WebSocket(`${protocol}//${window.location.host}/ws`);
+        state.socket = socket;
+
+        socket.onopen = () => setConnection("online");
+        socket.onerror = () => setConnection("offline");
+        socket.onclose = () => {
+          setConnection("offline");
+          window.clearTimeout(state.reconnectTimer);
+          state.reconnectTimer = window.setTimeout(connectWebSocket, 2500);
+        };
+        socket.onmessage = (event) => {
+          try {
+            const payload = JSON.parse(event.data);
+            if (payload.type === "state") {
+              state.central = payload.state;
+              render();
+            }
+          } catch (_) {}
+        };
+      }
+
+      function render() {
+        const activeAlert = state.catalog.alerts.find(
+          (alert) => alert.id === state.central.activeAlert,
+        );
+
+        elements.activeAlert.textContent = activeAlert ? activeAlert.label : "Sem alerta ativo";
+        elements.stopAlert.disabled = !state.central.activeAlert;
+
+        elements.alerts.innerHTML = "";
+        state.catalog.alerts.forEach((alert) => {
+          const button = document.createElement("button");
+          button.type = "button";
+          button.className = `alertButton${state.central.activeAlert === alert.id ? " active" : ""}`;
+          button.textContent = alert.label;
+          button.addEventListener("click", () => {
+            const confirmed = window.confirm(`Iniciar alerta: ${alert.label}?`);
+            if (confirmed) {
+              sendCommand(
+                `/api/alerts/${encodeURIComponent(alert.id)}/play`,
+                null,
+                elements.alertMessage,
+                "Alerta enviado.",
+              );
+            }
+          });
+          elements.alerts.appendChild(button);
+        });
+
+        elements.radios.innerHTML = "";
+        state.catalog.radios.forEach((radio) => {
+          const button = document.createElement("button");
+          const isActive =
+            state.central.isRadioPlaying && state.central.activeRadio === radio.id;
+          button.type = "button";
+          button.className = `radioButton${isActive ? " active" : ""}`;
+          button.innerHTML = `<span>${radio.name || radio.label}</span><strong>${isActive ? "Ativa" : "Tocar"}</strong>`;
+          button.addEventListener("click", () => {
+            sendCommand(
+              `/api/radio/stations/${encodeURIComponent(radio.id)}`,
+              null,
+              elements.radioMessage,
+              "Estacao selecionada.",
+            );
+          });
+          elements.radios.appendChild(button);
+        });
+
+        elements.volume.value = String(state.central.radioVolume ?? 1);
+      }
+
+      function setConnection(status) {
+        elements.connectionDot.classList.remove("online", "offline");
+
+        if (status === "online") {
+          elements.connectionDot.classList.add("online");
+          elements.connectionText.textContent = "Ligado";
+          return;
+        }
+
+        if (status === "offline") {
+          elements.connectionDot.classList.add("offline");
+          elements.connectionText.textContent = "Sem ligacao";
+          return;
+        }
+
+        elements.connectionText.textContent = "A ligar";
+      }
+
+      function showMessage(element, text, isError) {
+        element.textContent = text;
+        element.classList.toggle("error", Boolean(isError));
+      }
+    </script>
+  </body>
+</html>
